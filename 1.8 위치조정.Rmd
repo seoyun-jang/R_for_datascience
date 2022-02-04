@@ -1,0 +1,230 @@
+---
+title: "1.8 위치조정"
+author: "seo yun Jang"
+date: '2022 2 4 '
+output: html_document
+---
+
+```R version 4.1.2 (2021-11-01) -- "Bird Hippie"```
+
+## 1.8 위치 조정
+`colour` 또는 `fill`옵션을 통해 막대 차트에 색상을 지정할 수 있다.
+
+```{r, warning=FALSE}
+library(tidyr)
+library(ggplot2)
+
+```
+
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, colour = cut))
+```
+
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, fill = color))
+```
+
+채우기(fill) 옵션을 `clarity`와 같은 다른 변수에 매핑하면 막대가 자동을 누적된다. 각 색상이 지정된 직사각형은 `cut`과 `clarity`의 조합으로 나타낸다.
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+```
+스택은 `position`옵션으로 지정된 위치 조정에 의해 자동으로 수행된다.
+
+### 1. `postion = "identity"`
+그래프 context에서 정확한 해당 위치에 각 개체를 배치한다. 막대끼리 서로 겹치기 때문에 그다지 유용하지 않다.
+`alpha` 값이 작아질 수로 투명해지기 때문에 이를 조정하여 볼 수 있다. 
+`alpha = NA`일 경우 
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity))+
+  geom_bar(alpha = NA, position = "identity")
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity))+
+  geom_bar(alpha = 1/5, position = "identity")
+```
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity))+
+  geom_bar(alpha = 0, position = "identity")
+```
+
+### 2. `position = "fill"`
+스태킹처럼 작동하지만 각 스택 막대 세트의 높이를 동일하게 만든다. 이로써 그룹 간의 비율을 더 쉽게 비교할 수 있다.
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+```
+
+
+### 3. `position = "dodge"`
+겹치는 개체를 바로 옆에 배치한다. 개별을 더 쉽게 비교할 수 있다.
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+```
+
+### 산점도에서 유용한 조정 유형
+앞에서 `mpg`데이터를 이용하여 산점도를 그렸을때의 산점도는 234개의 관측값이 있음에도 플롯에 126개 포인트만 표시한다.  
+```{r}
+ggplot(data = mpg)+
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+이는 `hwy`와 `displ`이 많은 포인트가 서로 중첩되도록 반올림하여 나타난다. 이와 같은 문제를 `overplowting`이라 한다. 이와 같은 배열은 데이터의 질랴이 어디에 있는지 보기 어렵게 만든다.  
+이와 같은 문제를 해결하기위해 `position` 옵션을 `jitter` 로 설정하여 위와 같은 격자를 피할 수 있다.  
+```{r}
+ 
+```
+  
+데이터셋이 작은 그래프일 수록 정확도가 떨어지지만 대규모일 수록 그래프가 더 잘 드러난다. 
+
+### 연습문제
+1. 이 플롯의 문제점은 무엇입니까? 어떻게 개선할 수 있습니까?
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y= hwy))+
+  geom_point()
+```
+  
+cty와 hwy의 값이 중첩되도록 반올림하여 나타내기 때문에 위와 같은 그래프가 만들어진다. 따라서 이 문제를 해결하기 위해서는 `position = jitter`을 추가해 그래프를 그린다.
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy))+
+  geom_point() +
+  geom_jitter()
+```
+
+2. `geom_jitter()`의 지터링의 양을 제어하기 위한 매개변수는 무엇입니까?  
+
+
+3. `geom_boxplot()`와 `geom_count()`를 비교하고 대조하시오  
+예를 들어 아래와 같은 boxplot과 count를 그릴 수 있다.
+```{r}
+ggplot(data = mpg) +
+  geom_jitter(mapping = aes(x = drv, y = displ ))
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_count(mapping = aes(x = drv, y = displ))
+```
+  
+boxplot의 경우 전체 데이터의 분포 비율과 level별로 값의 차이를 비교하기 쉽다.
+ count의 경우 데이터를 해당하는 실제 위치에 점이 개수에 따라 다른 크기로 찍히기 때문에 정확한 값을 확인하기 쉽고 boxplot 처럼 level별 비교가 쉽다.  
+ 
+  4. `geom_boxplot()`의 기본 위치조정은 무엇입니까? `mpg`데이터 셋을 이용하여 시각화하라.
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(y = displ, x = drv, color = factor(year)))
+```
+
+
+## Coordinate System
+일반적으로 기본 좌표계는 x 및 y위치가 독립적으로 작용하여 각 점의 위치를 결정하는 Cartesian 좌표계(임의의 차원의 유클리드 공간을 나타내는 좌표)이다.  
+  
+1. `coord_flip()` 
+`coord_flip()`은 x 및 y축을 전환한다. 이것은 수평 상자 그림을 그리는 경우 또는 긴 레이블에 유용하다.
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  coord_flip()
+```
+  
+두 변수의 매핑을 뒤집으면 동일한 결과를 얻을 수 있다.
+```{r}
+ggplot(data = mpg, mapping = aes(y = class, x = hwy)) +
+geom_boxplot()
+```
+
+2. `coord_quickmap()`
+`coord_quickmap()`은 지도에 대한 가로 세로 비율을 올바르게 설정한다.
+```{r, warning=FALSE}
+library(maps)
+library(mapdata)
+```
+
+```{r, warning = FALSE}
+nz <- map_data("nz")
+ggplot(nz, aes(long, lat, group, group)) +
+  geom_polygon(fill = "white", colour = "black")
+```
+
+```{r, warning = FALSE}
+nz <- map_data("nz")
+ggplot(nz, aes(long, lat, group, group)) +
+  geom_polygon(fill = "white", colour = "black") +
+  coord_quickmap()
+
+```
+
+`coord_polar()`는 극좌표를 사용다. 극좌표는 막대 차트와 Coxcomb 차트 사이의 흥미로운 연결을 보여준다.
+
+```{r, warning = FALSE}
+bar <- ggplot(data = diamonds) +
+  geom_bar(
+    mapping = aes(x = cut, fill = cut),
+    show.legend = FALSE,
+    width = 1
+  ) +
+  theme(aspect.ratio = 1)+
+  labs(x = NULL, y = NULL)
+
+```
+
+```{r, warning = FALSE}
+bar + coord_flip()
+```
+
+```{r, warning = FALSE}
+bar + coord_polar()
+```
+
+## 연습문제
+1. coord_polar()를 사용하여 누적 막대 차트를 원형차트로 전환하라.
+```{r}
+# 누적 막대 그래프
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+
+```
+
+```{r}
+# 원형차트
+bar <- ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity),
+           show.legend = FALSE,
+           width = 1)
+bar + coord_polar()
+```
+
+2. `labs()`는 무엇인가?
+```{r}
+ggplot(data = diamonds)+
+  geom_bar(mapping = aes(x = cut, fill = clarity),
+           show.legend = FALSE,
+           width = 1)+
+  theme(aspect.ratio = .5)+
+  labs(x = NULL, y = NULL)
+
+
+```
+
+3. `coord_map()`과 `coord_quickmap()`의 차이점은 무엇인가?
+`coord_map()`를 통해 지도의 상세한 모습을 불러 올 수 있다. 다만 `coord_quickmap`는 ggplot2패키지에서 바로 사용할 수 있으며, `coord_map()`보다 불러오는 속도가 빠르다.
+  
+
+4. 아래 플롯은 도시와 고속도로 mpg의 관계에 대해 무엇을 알려주는 가? `coord_fixed()`가 중요한 이유는 무엇인가? `geom_abline()`의 역할은 무엇인가?
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() +
+  geom_abline() +
+  coord_fixed()
+```
+  
+위의 그래프를 통해 cty가 커질 수록 hwy가 커지는 비례관계를 확인할 수 있다. 여기서 `geom_abline()`은 산점도에 대한 보조선을 그어주며, `coord_fixed()`를 통해 width를 줄여주는 역할을 하는 것을 알 수 있다.
