@@ -1,0 +1,111 @@
+---
+title: "3. 데이터 변형"
+author: "seo yun Jang"
+date: '2022 2 7 '
+output: html_document
+---
+# 3.1 들어가기
+### 3.1.1 준비하기
+```{r, warning=FALSE}
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+### 3.1.2 nycfilghts13
+```
+install.packages("nycflights13")
+
+```
+이 데이터프레임에는 뉴욕시에서 2013년에 출발한 336,776개의 모든 항공편이 포함되어 있다.  
+이 데이터프레임은 이전에 사용했던 데이터프레임과 조금 다르게 처음 몇 행과 화면에 들어가는 열만 표시된다. 
+
+```{r}
+nycflights13::flights
+flights <- nycflights13::flights
+```
+
+변수의 유형  
+- int : 정수  
+- dbl : 더블형, 또는 실수  
+- chr : 문자형 벡터, 혹은 문자열  
+- dttm : date-time
+
+### plyr 기초
+- filter() : 값을 기준으로 선택  
+- arrange() : 행을 재정렬  
+- select() : 이름으로 변수를 선택  
+- mutate() : 기존 변수들의 함수로 새로운 변수를 생성  
+- summariaze() : 많은 값을 하나의 요약값을 합침  
+  
+이것들은 모두 `group_by()`와 함께 사용할 수 있는데, 이는 전체 데이터셋에 동작하지 않고 그룹마다 동작하도록 각 함수의 범위를 변경한다.  
+이 여섯 함수가 데이터 작업 언어에서 **동사**가 된다.    
+1. 첫 인수는 데이터프레임이다.  
+2. 그 이후의 인수들은 (따옴표가 없는) 변수 이름을 사용하여 데이터프레임에 무엇을 할지를 설명한다.  
+3. 결과는 새로운 데이터프레임이다.  
+
+# 3.2 filter()로 행 필터링하기
+filter()를 이용하면 값을 기준으로 데이터를 서브셋 할 수 있다.  
+첫 번째 인수는 데이터프레임 이름을, 두 번째 이후의 인수들은 데이터프레임을 필터링하는 표현식들이다.
+```{r}
+# example : 1월 1일 항공편 모두를 선택
+filter(flights, month == 1, day == 1)
+(jan1 <- filter(flights, month ==1, day ==1))
+
+```
+dplyr 함수들은 입력을 절대 수정하지 않기 때문에, 결과를 저장하려면 할당 연산자 <- 를 사용해야한다.  
+결과를 출력하면서 변수에 저장하기 위해서는 할당문을 괄호로 묶는다.
+```{r}
+(dec25 <- filter(flights, month == 12, day == 25))
+```
+
+### 3.2.1 비교 연산
+```
+# example
+filter(flights, month=1)
+
+```
+위와 같이 실행했을 때 Did you mean `month == 1`? 라는 에러 메세지를 통해 할 수 있듯이 = 대신 ==를 사용하며, 같지 않은 경우 ==!를 사용한다
+```{r}
+# example
+filter(flights, day ==! 3)
+```
+
+=를 사용할 때 자주 발생하는 다른 문제는 부동소수점 숫자이다.
+```{r}
+# example
+sqrt(2) ^ 2 == 2
+1/49 * 49 == 1
+```
+컴퓨터는 유한 정밀도 산술을 사용하므로 위와 같은 상황의 결과값은 근사값이다.
+```{r}
+near(sqrt(2) ^ 2, 2)
+near(1 / 49 * 49, 1)
+```
+
+### 3.2.2 논리 연산자
+filter의 인수들은 'and'로 결합된다. 즉, 모든 표현식이 참이어야 행이 출력에 포함된다. 다른 유형의 조합을 만들려면 직접 불(Boolean) 연산자를 사용해야한다.
+```{r}
+# example : 11월이나 12월에 출발한 항공편 모두 찾기
+(filter(flights, month == 11 | month == 12))
+```
+연산순서는 영어에서의 순서와 다르다. `filter(flights, month == 11 | 12)`로 쓰면 직역으로 'finds all flights that departed in November or December'로 번역할 수 있지만 이렇게 쓰게 될 경우 R은 11우러이나 12월에 출발한 항공편 대신 11 | 12(이 표현식은 TRUE가 된다)와 같은 달을 모두 찾는다. 따라서 수치형 문맥에서 TRUE는 1이므로 1월의 모든 항공편을 찾게 된다.  
+이 문제에 유용한 팁은 `x %in% y`이다. 이는 x가 y에 있는 값 중 하나인 행을 모두 선택한다.
+
+```{r}
+(filter(flights, month %in% c(11, 12)))
+```
+
+드모르간법칙을 이용하여 복잡한 서브셋 동작을 단순화 할 수도 있다.  
+```{}
+!(x & y) == !x | !y
+!(x | y) == !x & !y
+```
+
+```{r}
+# example: 출발 혹은 도착에서 두 시간 이상 지연되지 않은 항공편을 모두 찾는 경우
+filter(flights, !(arr_delay > 120 | dep_delay > 120))
+
+```
+
