@@ -1,0 +1,47 @@
+---
+title: "3.1 들어가기"
+author: "seo yun Jang"
+date: '2022 2 9 '
+output: html_document
+---
+# 3.1 들어가기
+
+### 3.1.1 준비하기
+```{r, warning=FALSE}
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+### 3.1.2 nycfilghts13
+```
+install.packages("nycflights13")
+
+```
+이 데이터프레임에는 뉴욕시에서 2013년에 출발한 336,776개의 모든 항공편이 포함되어 있다.  
+이 데이터프레임은 이전에 사용했던 데이터프레임과 조금 다르게 처음 몇 행과 화면에 들어가는 열만 표시된다. 
+
+```{r}
+nycflights13::flights
+flights <- nycflights13::flights
+```
+
+변수의 유형  
+- int : 정수  
+- dbl : 더블형, 또는 실수  
+- chr : 문자형 벡터, 혹은 문자열  
+- dttm : date-time
+
+### plyr 기초
+- filter() : 값을 기준으로 선택  
+- arrange() : 행을 재정렬  
+- select() : 이름으로 변수를 선택  
+- mutate() : 기존 변수들의 함수로 새로운 변수를 생성  
+- summariaze() : 많은 값을 하나의 요약값을 합침  
+  
+이것들은 모두 `group_by()`와 함께 사용할 수 있는데, 이는 전체 데이터셋에 동작하지 않고 그룹마다 동작하도록 각 함수의 범위를 변경한다.  
+이 여섯 함수가 데이터 작업 언어에서 **동사**가 된다.    
+1. 첫 인수는 데이터프레임이다.  
+2. 그 이후의 인수들은 (따옴표가 없는) 변수 이름을 사용하여 데이터프레임에 무엇을 할지를 설명한다.  
+3. 결과는 새로운 데이터프레임이다.  
