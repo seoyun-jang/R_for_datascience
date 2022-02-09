@@ -1,0 +1,8 @@
+---
+title: "3.4_select_columns"
+author: "seo yun Jang"
+date: '2022 2 9 '
+output: html_document
+---
+
+# 3.4 
