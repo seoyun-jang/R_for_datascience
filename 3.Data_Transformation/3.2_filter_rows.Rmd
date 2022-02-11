@@ -1,10 +1,19 @@
 ---
-title: "3.2_Filter_rows"
+title: "3.2 Filter rows with fliter()"
 author: "seo yun Jang"
 date: '2022 2 7 '
 output: html_document
 ---
-# 3.2 filter()로 행 필터링하기
+```{r, warning=FALSE}
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+flights <- nycflights13::flights
+```
+
+## 3.2 filter()로 행 필터링하기
 
 filter()를 이용하면 값을 기준으로 데이터를 서브셋 할 수 있다.  
 첫 번째 인수는 데이터프레임 이름을, 두 번째 이후의 인수들은 데이터프레임을 필터링하는 표현식들이다.
