@@ -4,7 +4,7 @@ author: "seo yun Jang"
 date: '2022 2 9 '
 output: html_document
 ---
-# 3.1 들어가기
+## 3.1 들어가기
 
 ### 3.1.1 준비하기
 ```{r, warning=FALSE}
